@@ -1,8 +1,10 @@
+package com.plisken1997.formater
+
 import java.time.LocalDateTime
-
 import scala.util.{Success, Try}
+import com.plisken1997.converter.formater.JsonFlatFileFormater
 
-package object formater {
+object Formater {
 
   /**
     *

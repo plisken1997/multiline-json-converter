@@ -1,5 +1,8 @@
-name := "LV Contrib"
+name := "Multiline JSON Converter"
 
-version := "1.0"
+version := "0.0.1"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
+
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.1"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"

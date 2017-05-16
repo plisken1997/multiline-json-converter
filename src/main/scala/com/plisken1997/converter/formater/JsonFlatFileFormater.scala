@@ -1,4 +1,4 @@
-package formater
+package com.plisken1997.converter.formater
 
 import scala.util.{Failure, Success, Try}
 import java.nio.file.{Files, Path, Paths, StandardOpenOption}
@@ -63,7 +63,7 @@ object JsonFlatFileFormater {
       if (-1 == r || pos > max) acc
       else {
         val jsonBuffer = partialJson + new String(a)
-        extractJson(jsonBuffer ) match {
+        JsonExtractor.extractJson(jsonBuffer) match {
           case Right((json, buffer)) => {
             writer(json.toCharArray.map(_.toByte))
             smt(input, acc ++ List(a), buffer, pos + 1)(writer)
@@ -74,33 +74,5 @@ object JsonFlatFileFormater {
     }
 
     smt(input, Nil, "", 0)(writer)
-  }
-
-  /**
-    *
-    * @param chunck
-    * @return
-    */
-  private def extractJson(chunck: String): Either[String, (String, String)] = {
-    @tailrec
-    def extractor(open: Int, content: List[Char], pos: Int): Int = {
-      if (content.isEmpty) -1
-      else {
-        if (content.head == '}') {
-          if (open - 1 == 0) pos + 1
-          else extractor(open - 1, content.tail, pos + 1)
-        }
-        else {
-          if (content.head == '{') extractor(open + 1, content.tail, pos + 1)
-          else extractor(open, content.tail, pos + 1)
-        }
-      }
-    }
-    val pos = extractor(1, chunck.toCharArray.toList.tail, 1)
-    if (pos == -1) {
-      Left(chunck)
-    } else {
-      Right(chunck.substring(0, pos), chunck.substring(pos))
-    }
   }
 }
