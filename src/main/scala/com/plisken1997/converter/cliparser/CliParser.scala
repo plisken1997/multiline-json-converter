@@ -1,4 +1,4 @@
-package com.plisken1997.converter.parser
+package com.plisken1997.converter.cliparser
 
 
 object CliParser {

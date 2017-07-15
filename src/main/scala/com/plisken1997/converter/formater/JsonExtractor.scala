@@ -2,9 +2,6 @@ package com.plisken1997.converter.formater
 
 import scala.annotation.tailrec
 
-/**
-  * Created by rbacconnier on 17/05/2017.
-  */
 object JsonExtractor {
   /**
     *
@@ -12,7 +9,7 @@ object JsonExtractor {
     * @return
     */
   def extractJson(chunck: String): Either[String, (String, String)] = {
-    // @todo handle empty strung for chunk
+    // @todo handle empty string for chunk !!
     val pos = extractor(1, chunck.toCharArray.toList.tail, 1)
     if (pos == -1) {
       Left(chunck)

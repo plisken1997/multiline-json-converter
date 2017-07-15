@@ -2,7 +2,7 @@ package com.plisken1997.converter.formater
 
 import org.scalatest.FlatSpec
 
-class JsonFlatFileFormaterSpec extends FlatSpec {
+class JsonFlatFileReaderSpec extends FlatSpec {
 
   val incompleteJson = "{\"created_at\":\"Wed May 28 17:40:11 +0000 2014\",\"id\":471707521"
   val wellFormattedJson = "{\"created_at\":\"Wed May 28 17:40:11 +0000 2014\",\"id\":471707521414344704,\"id_str\":\"471707521414344704\"}"

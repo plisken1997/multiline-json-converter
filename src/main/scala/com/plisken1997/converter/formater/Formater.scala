@@ -2,22 +2,20 @@ package com.plisken1997.formater
 
 import java.time.LocalDateTime
 import scala.util.{Success, Try}
-import com.plisken1997.converter.formater.JsonFlatFileFormater
+import com.plisken1997.converter.formater.JsonFlatFileReader
+import com.plisken1997.converter.writer.{IoWritter, JSONWriter}
 
 object Formater {
 
   /**
     *
     * @param src
-    * @param dest
     * @return
     */
-  def prepareFile(src: String, dest: String): Try[String] = withDateLog[Try[String]] { () =>
-    for {
-      destfile <- JsonFlatFileFormater.formatFile(src, dest)
-      _ <- Success(println(s"${destfile} created !"))
-    } yield (destfile)
-  }
+  def read[T](src: String)(writer: JSONWriter[T]): Try[String] = withDateLog[Try[String]] { () =>
+    // val ioWriter:IoWritter[Path] = writer.write(_: Array[Byte])
+    JsonFlatFileReader.formatFile(src)(writer)
+  }(println)
 
   /**
     *
@@ -25,10 +23,10 @@ object Formater {
     * @tparam A
     * @return
     */
-  private def withDateLog[A](fn: () => A): A =  {
-    println(s"jsonfile format started at ${LocalDateTime.now()}")
+  private def withDateLog[A](fn: () => A)(logWriter: String => Any): A =  {
+    logWriter(s"jsonfile format started at ${LocalDateTime.now()}")
     val res = fn()
-    println(s"jsonfile format ended at ${LocalDateTime.now()}")
+    logWriter(s"jsonfile format ended at ${LocalDateTime.now()}")
     res
   }
 }

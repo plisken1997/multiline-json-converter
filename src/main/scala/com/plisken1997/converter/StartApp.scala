@@ -1,21 +1,19 @@
 package com.plisken1997.converter
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 
-import com.plisken1997.converter.parser.CliParser
+import com.plisken1997.converter.cliparser.CliParser
+import com.plisken1997.converter.writer.PrettyJSONFileWriter
 import com.plisken1997.formater.Formater
 
 import scala.util.{Failure, Success, Try}
 
-/**
-  * Created by rbacconnier on 17/05/2017.
-  */
 object StartApp {
   lazy val home = Paths.get("").toAbsolutePath.toString
 
   def main(args: Array[String]): Unit = {
     val format = CliParser.parse(args) match {
-      case Some(config) => formatFile(config.source, config.dest)
+      case Some(config) => handleFormatFile(config.source, config.dest)
       case _ => Failure(new RuntimeException("invalid command line arguments. You should provide a `source|s` filepath option"))
     }
 
@@ -31,22 +29,24 @@ object StartApp {
     * @param destFile
     * @return
     */
-  private def formatFile(srcFile: Option[String], destFile: Option[String]): Try[String] = {
-    lazy val flatJSONFile = srcFile.map{ src =>
-      if (src.startsWith("/")) src
-      else s"$home/$src"
-    }.get
+  private def handleFormatFile(srcFile: Option[String], destFile: Option[String]): Try[String] = {
+    def formatRelativePath(path: String) = if (path.startsWith("/")) path else s"$home/$path"
 
-    lazy val niceJSONFile = destFile.map { dest =>
-      if (dest.startsWith("/")) dest
-      else s"$home/$dest"
-    }.getOrElse(s"$home/output-json.json")
+    lazy val defaultOutputPath = s"$home/output-json.json"
+    lazy val flatJSONFile = srcFile.map(formatRelativePath)
+    val targetJSONFile = destFile.map(formatRelativePath).getOrElse(defaultOutputPath)
 
-    if (Files.exists(Paths.get(niceJSONFile))) {
-      Failure(new RuntimeException(s"File $niceJSONFile already exists"))
+    if (Files.exists(Paths.get(targetJSONFile))) {
+      Failure(new RuntimeException(s"File $targetJSONFile already exists"))
     } else {
-      println(s"Read JSON from $flatJSONFile to $niceJSONFile")
-      Formater.prepareFile(flatJSONFile, niceJSONFile)
+      println(s"Read JSON from $flatJSONFile to $targetJSONFile")
+      PrettyJSONFileWriter
+        .createWriter(targetJSONFile)
+        .flatMap { writer =>
+          flatJSONFile
+            .map(Formater.read(_)(writer))
+            .getOrElse(Failure(new RuntimeException("Input json file should be given")))
+        }
     }
   }
 }
